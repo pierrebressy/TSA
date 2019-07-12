@@ -1,0 +1,504 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2. Lab 1 - Correlation &#8212; tsa 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="1. Lab 0 - Python crash course" href="lab00-python-crash-course.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">DEMANDER UNE VM pour JUPYTER HUB important</p>
+</div>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">have a look to repl…</p>
+</div>
+<div class="section" id="lab-1-correlation">
+<h1>2. Lab 1 - Correlation<a class="headerlink" href="#lab-1-correlation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="test-on-repl">
+<h2>2.1. TEST ON REPL<a class="headerlink" href="#test-on-repl" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://repl.it/&#64;pierrebressy/CoordinatedSuperbExams">test</a></p>
+<iframe height="400px" width="100%" src="https://repl.it/@pierrebressy/CoordinatedSuperbExams?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe></div>
+<div class="section" id="theoretical-part">
+<h2>2.2. Theoretical part<a class="headerlink" href="#theoretical-part" title="Permalink to this headline">¶</a></h2>
+<p>Correlation is a technique which aims to point out the similarity
+between signals or the degree of similarity between a signal and
+itself. This approach is very useful in the following domains :</p>
+<ul>
+<li><p class="first">In one dimension</p>
+<ul>
+<li><p class="first">Radar</p>
+<div class="align-center figure" id="id1">
+<a class="reference internal image-reference" href="_images/Sonar_Principle_EN.png"><img alt="alternate text" src="_images/Sonar_Principle_EN.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text"> <a class="reference external" href="https://en.wikipedia.org/wiki/Sonar">Sonar principle on Wikipedia</a></span></p>
+</div>
+</li>
+<li><p class="first">Speech analysis</p>
+<div class="align-center figure" id="id2">
+<a class="reference internal image-reference" href="_images/SpeechModel.png"><img alt="alternate text" src="_images/SpeechModel.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Speech Model using <em>LPC</em>. <em>how-the-speak-n-spell-worked</em>.</span></p>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first">In two dimensions</p>
+<ul>
+<li><p class="first">Flow measurement</p>
+<div class="align-center figure" id="id3">
+<a class="reference internal image-reference" href="_images/DebitMetreMKFast.png"><img alt="alternate text" src="_images/DebitMetreMKFast.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Flow measurement (<em>DebitMetre.m</em>).</span></p>
+</div>
+</li>
+<li><p class="first">Pattern recognition</p>
+<div class="align-center figure" id="id4">
+<a class="reference internal image-reference" href="_images/TNormXCorr2.png"><img alt="alternate text" src="_images/TNormXCorr2.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Car’s Rear light detection by using normalised cross-correlation
+(<em>TNormXCorr2.m</em>).</span></p>
+</div>
+<p>The strength of these approach is a very <strong>high robustness</strong> to noise.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="white-and-colored-noise">
+<h3>2.2.1. White and colored noise<a class="headerlink" href="#white-and-colored-noise" title="Permalink to this headline">¶</a></h3>
+<p>A <em>pseudo-white</em> noise is obtained by using random generators. Note
+that <em>white</em> refers to the signal memory or correlation whereas
+<em>uniform</em> or <em>Gaussian</em> refers to the amplitude distribution.
+Next figure describes a uniform distributed white noise and a
+<em>Gaussian</em> distributed white noise :</p>
+<div class="align-center figure" id="id5">
+<a class="reference internal image-reference" href="_images/TWhiteNoise.png"><img alt="alternate text" src="_images/TWhiteNoise.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Uniformly distributed white noise signal,
+distribution and auto-correlation (a, b, c), Ibid with a
+<em>Gaussian</em> distribution (d, e, f) (<em>TWhiteNoise.m</em>).</span></p>
+</div>
+<p>To color a white noise means to introduce structure in a non
+structured signal is obtained by <em>FIR</em> or <em>IIR</em> filtering.</p>
+<div class="section" id="fir-filter">
+<h4>2.2.1.1. <em>FIR</em> filter<a class="headerlink" href="#fir-filter" title="Permalink to this headline">¶</a></h4>
+<p>A <em>FIR</em> filter can be defined by :</p>
+<ol class="arabic">
+<li><p class="first">Its length <img class="math" src="_images/math/c2a960af446bfa3f5e623cf9a64a752beffcb7e1.png" alt="L=N+1"/> impulse response</p>
+<div class="math" id="equation-firlength">
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-firlength" title="Permalink to this equation">¶</a></span><img src="_images/math/6eb9674588746dd696c52bd6049503cffb16f0e4.png" alt="h[n]=\left\{ h[0],h[1],h[2],\cdots,h[N]\right\} =\sum_{k=0}^{N}h[k]\,\delta[n-k]"/></p>
+</div><p>where <img class="math" src="_images/math/a702e781dfc76762a3a132c2031fba8898430925.png" alt="\delta"/> is the <em>Kronecker</em> symbol</p>
+</li>
+<li><p class="first">Its difference equation</p>
+<blockquote>
+<div><div class="math" id="equation-firdiffequ">
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-firdiffequ" title="Permalink to this equation">¶</a></span><img src="_images/math/e7d19559c1e31aaa141481cb9e4c39a0168eca65.png" alt="y[n]=\sum_{k=0}^{N}h[k]\, x[n-k]"/></p>
+</div></div></blockquote>
+</li>
+<li><p class="first">Its order <img class="math" src="_images/math/f4170ed8938b79490d8923857962695514a8e4cb.png" alt="N"/> transfer function</p>
+<div class="math" id="equation-firorder">
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-firorder" title="Permalink to this equation">¶</a></span><img src="_images/math/080db599fa26c68cf0fef60514e4d6445a350d78.png" alt="H(z)=\frac{Y(z)}{X(z)}=\sum_{n=0}^{N}h[n]\, z^{-n}"/></p>
+</div></li>
+<li><p class="first">Its frequency response obtained by replacing the complex variable</p>
+</li>
+</ol>
+<blockquote>
+<div><p><img class="math" src="_images/math/1a4b8d0a55f4ac355c094e93f5fdef08d7c20762.png" alt="z^{-1}"/> by <img class="math" src="_images/math/9070f5b50af7305f52668fc150745aaa9455b6e1.png" alt="e^{-j\Omega}"/></p>
+<div class="math" id="equation-firfreqrespons">
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-firfreqrespons" title="Permalink to this equation">¶</a></span><img src="_images/math/3b248956d7810e2f23da8e70db3624b0965b1b86.png" alt="H(j\Omega)=\frac{Y(j\Omega)}{X(j\Omega)}=\sum_{n=0}^{N}h[n]\, e^{-jn\Omega}"/></p>
+</div></div></blockquote>
+</div>
+<div class="section" id="iir-filter">
+<h4>2.2.1.2. <em>IIR</em> filter<a class="headerlink" href="#iir-filter" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><p>An <em>IIR</em> filter can be described by :</p>
+<ol class="arabic">
+<li><p class="first">its recursive difference equation</p>
+<div class="math" id="equation-eqdrii">
+<p><span class="eqno">(5)<a class="headerlink" href="#equation-eqdrii" title="Permalink to this equation">¶</a></span><img src="_images/math/09edf80f5046d1ae94c3e2f198e29405189d53ca.png" alt="y[n]  =  b_{0}x[n]+b_{1}\, x[n-1]+b_{2}\, x[n-2]+\cdots \\
+  -a_{1}\, y[n-1]-a_{2}\, y[n-2]-\cdots"/></p>
+</div></li>
+<li><p class="first">Its corresponding transfer function (positive power of <img class="math" src="_images/math/683f2dd9129a91d21aaf1c04afa6f78b39d4cb0a.png" alt="z"/>)</p>
+<div class="math" id="equation-iirhz">
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-iirhz" title="Permalink to this equation">¶</a></span><img src="_images/math/4cd6c37b1aedf4275e39d01f4a0e2b006fea7fab.png" alt="H(z)=\frac{b_{0}z^{n}+b_{1}z^{n-1}+\cdots
+  +b_{n}}{z^{n}+a_{1}z^{n-1}+\cdots +a_{n}}"/></p>
+</div></li>
+<li><p class="first">Its corresponding transfer function (negative power of <img class="math" src="_images/math/683f2dd9129a91d21aaf1c04afa6f78b39d4cb0a.png" alt="z"/>)</p>
+<div class="math" id="equation-iirhz2">
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-iirhz2" title="Permalink to this equation">¶</a></span><img src="_images/math/a9a8b9de200d0c0f26745b3876660d35d5b5bf16.png" alt="H(z)=\frac{b_{0}+b_{1}z^{-1}+\cdots +b_{n}z^{-n}}{1+a_{1}z^{-1}+\cdots
+  +a_{n}z^{-n}}"/></p>
+</div></li>
+</ol>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="auto-correlation">
+<h3>2.2.2. Auto-correlation<a class="headerlink" href="#auto-correlation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><div class="line-block">
+<div class="line">In this case, the goal is to compute the degree of similarity between
+the signal and itself. It gives an indication about the <em>colorness</em> of
+a signal, a white noise being theoretically totally un-correlated
+whereas a <em>colored</em> signal exhibits a stronger auto-correlation.</div>
+</div>
+</div></blockquote>
+<div class="section" id="difference-between-correlation-and-convolution">
+<h4>2.2.2.1. Difference between correlation and convolution<a class="headerlink" href="#difference-between-correlation-and-convolution" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><img alt="_images/ComparisonConvolutionCorrelation.png" src="_images/ComparisonConvolutionCorrelation.png" />
+</div></blockquote>
+</div>
+<div class="section" id="true-auto-correlation">
+<h4>2.2.2.2. True auto-correlation<a class="headerlink" href="#true-auto-correlation" title="Permalink to this headline">¶</a></h4>
+<p>The <strong>true</strong> auto-correlation function is a mathematical concept that
+can not be computed because it requires an infinite number of
+realisations of the signal <img class="math" src="_images/math/fdd6cfcfcf9fff4908772050fcf2adf4f79c659c.png" alt="x_r[n], r = 1, 2, \cdots \infty"/>. It
+is defined as :</p>
+<div class="math" id="equation-trueautocorrelation">
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-trueautocorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/699d84b6b345b9615bf41eddc9b7705effd899a3.png" alt="r_{xx}[k]=E\left\{x[n]x[n+k]\right\}"/></p>
+</div><p>where <img class="math" src="_images/math/4b6222b865b812d2a59368cd1629eed6b54454d5.png" alt="E"/> denotes the expectation and <img class="math" src="_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> is called the
+<strong>Lag</strong>. Because of the infinite numbers of realisations required, only
+correlation estimators <img class="math" src="_images/math/4ef20e7529b99dd1302131f987a68a99cfb7d2b8.png" alt="\hat{r}_{xx}[k]"/> can be computed.</p>
+</div>
+<div class="section" id="biased-auto-correlation-estimate">
+<h4>2.2.2.3. Biased auto-correlation estimate<a class="headerlink" href="#biased-auto-correlation-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="math" id="equation-biasedautocorrelation">
+<p><span class="eqno">(9)<a class="headerlink" href="#equation-biasedautocorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/e0096598d92cdf23c3bdc7fed72042531b6d7e94.png" alt="\hat{r}_{xx}[k]=\frac{1}{N}\sum_{n=0}^{N-1}x[n]\, x[n+k],\qquad k_{min}\le k\le k_{max}"/></p>
+</div></div>
+<div class="section" id="unbiased-auto-correlation-estimate">
+<h4>2.2.2.4. Unbiased auto-correlation estimate<a class="headerlink" href="#unbiased-auto-correlation-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="math" id="equation-unbiasedautocorrelation">
+<p><span class="eqno">(10)<a class="headerlink" href="#equation-unbiasedautocorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/1dbbd95178ec77e228820daacca1027efd131d30.png" alt="\hat{r}_{xx}[k]=\frac{1}{N-\left|k\right|}\sum_{n=0}^{N-\left|k\right|}x[n]\, x[n+k],\qquad0\le k\le N-1"/></p>
+</div></div>
+<div class="section" id="biased-auto-covariance-estimate">
+<h4>2.2.2.5. Biased auto-covariance estimate<a class="headerlink" href="#biased-auto-covariance-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="math" id="equation-biasedautocovariance">
+<p><span class="eqno">(11)<a class="headerlink" href="#equation-biasedautocovariance" title="Permalink to this equation">¶</a></span><img src="_images/math/286322728cf9a4bbd16036f6e406827354de8299.png" alt="\hat{c}_{xx}[k]=\frac{1}{N}\sum_{n=0}^{N-1}(x[n]-\bar{x})\, (x[n+k]-\bar{x}),\qquad k_{min}\le k\le k_{max}"/></p>
+</div></div>
+</div>
+<div class="section" id="cross-correlation">
+<h3>2.2.3. Cross-correlation<a class="headerlink" href="#cross-correlation" title="Permalink to this headline">¶</a></h3>
+<p>In this case, the goal is to compute the degree of similarity between a
+signal and another one, a pattern for example.</p>
+<div class="section" id="true-cross-correlation">
+<h4>2.2.3.1. True cross-correlation<a class="headerlink" href="#true-cross-correlation" title="Permalink to this headline">¶</a></h4>
+<p>The remarks about the true auto-correlation function applies equally
+here.</p>
+<div class="math" id="equation-crosscorrelation">
+<p><span class="eqno">(12)<a class="headerlink" href="#equation-crosscorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/a4764054a7fa461a9c1e7d1bb705a19b23d432de.png" alt="r_{xy}[k]=E\left\{x[n]y[n+k]\right\}"/></p>
+</div></div>
+<div class="section" id="biased-cross-correlation-estimate">
+<h4>2.2.3.2. Biased cross-correlation estimate<a class="headerlink" href="#biased-cross-correlation-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="math" id="equation-biasedcrosscorrelation">
+<p><span class="eqno">(13)<a class="headerlink" href="#equation-biasedcrosscorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/bd301ba00d62231a3b5ff7c4fe546bc9033f6ae7.png" alt="\hat{r}_{xy}[k]=\frac{1}{N}\sum_{n=0}^{N-1}x[n]\, y[n+k],\qquad k_{min}\le k\le k_{max}"/></p>
+</div></div>
+<div class="section" id="unbiased-cross-correlation-estimate">
+<h4>2.2.3.3. Unbiased cross-correlation estimate<a class="headerlink" href="#unbiased-cross-correlation-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="math" id="equation-unbiasedcrosscorrelation">
+<p><span class="eqno">(14)<a class="headerlink" href="#equation-unbiasedcrosscorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/e667fec0c552145b01af953b259bd72a64fb53a0.png" alt="\hat{r}_{xy}[k]=\frac{1}{N-\left|k\right|}\sum_{n=0}^{N-\left|k\right|}x[n]\, y[n+k],\qquad0\le k\le N-1"/></p>
+</div></div>
+<div class="section" id="biased-cross-covariance-estimate">
+<h4>2.2.3.4. Biased cross-covariance estimate<a class="headerlink" href="#biased-cross-covariance-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="math" id="equation-biasedcrosscovariance">
+<p><span class="eqno">(15)<a class="headerlink" href="#equation-biasedcrosscovariance" title="Permalink to this equation">¶</a></span><img src="_images/math/fb921e5abc3f5ffee35d2c169fb00665f9ef7b64.png" alt="\hat{c}_{xy}[k]=\frac{1}{N}\sum_{n=0}^{N-1}(x[n]-\bar{x})\, (y[n+k]-\bar{y}),\qquad k_{min}\le k\le k_{max}"/></p>
+</div></div>
+<div class="section" id="coefficient-of-correlation">
+<h4>2.2.3.5. Coefficient of correlation<a class="headerlink" href="#coefficient-of-correlation" title="Permalink to this headline">¶</a></h4>
+<p>This coefficient goes from -1 (anti-correlation) to 0 (no correlation)
+to 1 (full correlation)</p>
+<div class="math" id="equation-correlationcoefficient">
+<p><span class="eqno">(16)<a class="headerlink" href="#equation-correlationcoefficient" title="Permalink to this equation">¶</a></span><img src="_images/math/e038bc3a314cb9620984bfed63c692747a20c756.png" alt="\rho = \frac{ \sum_{n=0}^{N-1}(x[n]-\bar{x})
+    (y[n]-\bar{y})} {\sqrt{\sum_{n=0}^{N-1}(x[n]-\bar{x})^2 \sum_{n=0}^{N-1}(y[n]-\bar{y})^2}}"/></p>
+</div></div>
+<div class="section" id="normalized-cross-correlation-estimate">
+<h4>2.2.3.6. Normalized cross-correlation estimate<a class="headerlink" href="#normalized-cross-correlation-estimate" title="Permalink to this headline">¶</a></h4>
+<p>This correlation signal <img class="math" src="_images/math/342ceb64f83c36fd7102bee2e93889a642534883.png" alt="\rho[k]"/> goes from -1 (anti-correlation)
+to 0 (no correlation) to 1 (full correlation). In this case, the pattern
+<img class="math" src="_images/math/f01477b3775a0f3331554fab5fd0b28ab5e63954.png" alt="x[n], n = 0 \cdots
+N_x-1"/> to be correlated with the signal <img class="math" src="_images/math/34cdcb4556ac1e979e8e22aa2e917bdc09cb309b.png" alt="y[n], n = 0 \cdots N_y-1"/>
+has as smaller extent, that is <img class="math" src="_images/math/9c3f32e25ccb5dab9afe8acee57b8f293e770bac.png" alt="N_x &lt; N_y"/>.</p>
+<div class="math" id="equation-normalizedcorrelation">
+<p><span class="eqno">(17)<a class="headerlink" href="#equation-normalizedcorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/c9e76a4556d84578b7a9fbf4649e324dd7a3f7ae.png" alt="\rho[k] = \frac{ \sum_{n=0}^{N_x-1}(x[n]-\bar{x})
+    (y[n+k]-\bar{y})} {\sqrt{\sum_{n=0}^{N_x-1}(x[n]-\bar{x})^2
+      \sum_{n=0}^{N_x-1}(y[n+k]-\bar{y})^2}}, k = 0 \cdots N_y-N_x"/></p>
+</div><p>Note that <img class="math" src="_images/math/56618fed8e2e4959294a3d553f7cd52e8b3e0fef.png" alt="\bar{x}"/> is the mean of the pattern <img class="math" src="_images/math/e78124a638a2b45aff238eee3f05ad284c83dba5.png" alt="x[n]"/>, but
+<img class="math" src="_images/math/b4070c26e385bdf428d20e1e5976bc2c425d4d34.png" alt="\bar{y}"/> is not the mean of the signal <img class="math" src="_images/math/b921f46e4636934accc21318b3f8ea402237c225.png" alt="y[n]"/> because
+<img class="math" src="_images/math/b4070c26e385bdf428d20e1e5976bc2c425d4d34.png" alt="\bar{y}"/> depends of the lag <img class="math" src="_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> and is computed for any
+displacement <img class="math" src="_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> of the pattern in the signal.</p>
+</div>
+</div>
+<div class="section" id="bit-correlator">
+<h3>2.2.4. 1 bit correlator<a class="headerlink" href="#bit-correlator" title="Permalink to this headline">¶</a></h3>
+<p>In some time critical applications, it is wise to replace the time
+consuming product by a sum or subtraction, depending on the sign of one
+of the 2 signals to be correlated. This is called <em>1 bit correlator</em>.</p>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">explain when using Biased auto-correlation, Unbiased auto-correlation, Biased auto-covariance,
+Cross-correlation, True cross-correlation, Biased cross-correlation, Coefficient of correlation,
+Normalized cross-correlation, 1 bit correlator.</p>
+</div>
+</div>
+<div class="section" id="correlation-theorem">
+<h3>2.2.5. Correlation theorem<a class="headerlink" href="#correlation-theorem" title="Permalink to this headline">¶</a></h3>
+<p>The correlation theorem states that</p>
+<div class="math" id="equation-correlationtheorem">
+<p><span class="eqno">(18)<a class="headerlink" href="#equation-correlationtheorem" title="Permalink to this equation">¶</a></span><img src="_images/math/e5ac16d39a164787be53abddbc17166f2affa7a9.png" alt="RC_{x, y} = XY^*"/></p>
+</div><p>Where :</p>
+<ol class="arabic">
+<li><div class="first line-block">
+<div class="line">The <img class="math" src="_images/math/e23b90761346c54331a8bfd0eef4086f73d9decc.png" alt="RC_{x, y}"/> demotes the <em>Discrete Fourier Transform</em> of
+<img class="math" src="_images/math/7077fd27a1c2ecfd25ee9d6efc56bc7aedbfb844.png" alt="rc_{x, y}"/></div>
+</div>
+</li>
+<li><p class="first">The <em>star</em> symbol denotes the complex conjugate</p>
+</li>
+<li><p class="first"><img class="math" src="_images/math/bcda8ca677ee5f7777305a7cf62be953939065ce.png" alt="rc_{xy}"/> is the circular correlation between the <img class="math" src="_images/math/a59f68a4202623bb859a7093f0316bf466e6f75d.png" alt="x"/> and
+<img class="math" src="_images/math/276f7e256cbddeb81eee42e1efc348f3cb4ab5f8.png" alt="y"/> sequences</p>
+<div class="math" id="equation-circularcorrelation">
+<p><span class="eqno">(19)<a class="headerlink" href="#equation-circularcorrelation" title="Permalink to this equation">¶</a></span><img src="_images/math/910d67844ba2fcc10dd22d357263cde1d7847bad.png" alt="rc_{x, y}[k]=\sum_{n=0}^{N-1}x[n]y_N[k+n]"/></p>
+</div><p>with</p>
+<div class="math">
+<p><img src="_images/math/afa02d80366b42742578bb72efefafb7ca6ce6b2.png" alt="y_N[n]=y[mod(n, N)]"/></p>
+</div></li>
+</ol>
+<p>Next figure illustrates this theorem by computing the auto-correlation
+of a white noise <em>Gaussian</em> distributed signal having 200 samples. Three
+methods are compared :</p>
+<ol class="arabic simple">
+<li>By using the biased estimate without normalisation</li>
+<li>By using the circular correlation without normalisation</li>
+<li>By using the <em>Fourier</em> approach</li>
+</ol>
+<blockquote>
+<div><img alt="_images/TCorrelationTheorem.png" src="_images/TCorrelationTheorem.png" />
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="practical-part">
+<h2>2.3. Practical part<a class="headerlink" href="#practical-part" title="Permalink to this headline">¶</a></h2>
+<p>This is the list of the proposed correlation exercices</p>
+<ol class="arabic simple">
+<li>Toy example</li>
+<li>Frequency estimation of a sine wave</li>
+<li>Signal detection of a signal burried in noise</li>
+<li>Search of a sub-string within a string</li>
+<li>Piano tone detection</li>
+</ol>
+<div class="section" id="toy-example">
+<h3>2.3.1. Toy example<a class="headerlink" href="#toy-example" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">An advice : don’t go to your computer before you are sure to be able
+to correctly transform an equation, like <a class="reference internal" href="#equation-biasedautocorrelation">(9)</a>
+into an algorithm !</div>
+<div class="line">For example, let’s assume that :</div>
+</div>
+<div class="math">
+<p><img src="_images/math/46a86c3699843db73dc0341817bcb7bdea76f50c.png" alt="\begin{aligned}
+x[n] &amp;=&amp;[2, 1, 5], n = 0, 1, 2\\
+y[n]&amp;=&amp;[3, 4], n = 0, 1\end{aligned}"/></p>
+</div><p>With pencil and paper, compute <img class="math" src="_images/math/0cc8f7bd557cd87be23f981264ce5c0b70b97799.png" alt="r_{xy}[lag]"/> by using
+<a class="reference internal" href="#equation-biasedautocorrelation">(9)</a>. Next figure describes the <em>Matlab</em> answer
+(<em>xcorr</em>) to this problem. As a conclusion, we see that <em>Matlab</em> has a
+different definition of the correlation (time reverse).</p>
+<div class="align-center figure" id="id6">
+<a class="reference internal image-reference" href="_images/CorrelationToyExample.png"><img alt="alternate text" src="_images/CorrelationToyExample.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text"><img class="math" src="_images/math/e78124a638a2b45aff238eee3f05ad284c83dba5.png" alt="x[n]"/> (a), <img class="math" src="_images/math/b921f46e4636934accc21318b3f8ea402237c225.png" alt="y[n]"/> (b), <img class="math" src="_images/math/ada0f47954e4f0e72732ae57a86691168118d742.png" alt="r_{xy}[n]"/> (c) and
+<img class="math" src="_images/math/d67b8fadef230851b0d1a9ae0e3a641d5e619764.png" alt="r_{yx}[n]"/> (d)  (<em>CorrelationToyExample.m</em>).</span></p>
+</div>
+</div>
+<div class="section" id="toy-example-for-normalised-cross-correlation">
+<h3>2.3.2. Toy example for normalised cross-correlation<a class="headerlink" href="#toy-example-for-normalised-cross-correlation" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">The goal of the normalised cross-correlation is to detect the
+co-evolution of 2 signals or of 1 signal and one template. This
+coefficient is between -1 (full anti correlation), 0 (no correlation)
+and 1 (full correlation).</div>
+<div class="line">Let’s assume that :</div>
+</div>
+<div class="math">
+<p><img src="_images/math/49cca89829fcf39b938d361b25a0aedcd205eb9a.png" alt="x[n] =[1, 3, 5], n = 0, 1, 2\\
+y[n] =[1, -1], n = 0, 1"/></p>
+</div><p>The normalised cross-correlation should be -1 everywhere because,
+although the slope and offset are different, the signals and the
+template anti covariate.</p>
+<div class="align-center figure" id="id7">
+<a class="reference internal image-reference" href="_images/CorrelationCoefficientToyExample.png"><img alt="alternate text" src="_images/CorrelationCoefficientToyExample.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">The template <img class="math" src="_images/math/e78124a638a2b45aff238eee3f05ad284c83dba5.png" alt="x[n]"/> (a), the signal <img class="math" src="_images/math/b921f46e4636934accc21318b3f8ea402237c225.png" alt="y[n]"/> (b),
+the normalised cross-correlation coefficient <img class="math" src="_images/math/8ca0ab239ad8073c96d5b49a7e829ad485939844.png" alt="\rho_{xy}[n]"/> (c)
+(<em>CorrelationCoefficientToyExample.m</em>).</span></p>
+</div>
+</div>
+<div class="section" id="frequency-estimation-of-a-sine-wave">
+<h3>2.3.3. Frequency estimation of a sine wave<a class="headerlink" href="#frequency-estimation-of-a-sine-wave" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="context">
+<h4>2.3.3.1. Context<a class="headerlink" href="#context" title="Permalink to this headline">¶</a></h4>
+<p>It happens that, if <img class="math" src="_images/math/416f548cdebdf39c7c6976eec1cbd63cb6ba7de2.png" alt="x[n] = A \sin(\omega n T_s)"/>, the
+corresponding auto correlation function is given by :</p>
+<div class="math">
+<p><img src="_images/math/27237d6ea094aafc34e1fe23ff52142266077b74.png" alt="r_{ss}[k] = \frac{A^2}{2} \cos(\omega k T_s)
+  \label{eq.AutocorrelationOfASineWave}"/></p>
+</div><p>So, to detect the frequency of a sine wave, the procedure is the
+following :</p>
+<ol class="arabic simple">
+<li>Compute the auto-correlation.</li>
+<li>Compute the location of the second peak, the first, at <img class="math" src="_images/math/5b5423c8f7ddcd1fc5ce3169d8060bf20abf3b88.png" alt="lag =0"/>, containing the energy of the signal <img class="math" src="_images/math/e0e911b398b7ae35daf2b71c16702cd710cc1e2d.png" alt="\frac{A^2}{2}"/>.</li>
+<li>Compute the frequency <img class="math" src="_images/math/57505ceeef9418dbd41265b2143b4895ce4e1e8c.png" alt="f = \frac{1}{k^* T_s}"/></li>
+</ol>
+<div class="align-center figure" id="id8">
+<a class="reference internal image-reference" href="_images/TDetectSineFreq.png"><img alt="alternate text" src="_images/TDetectSineFreq.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Original signal (a), <img class="math" src="_images/math/517f138b7aa4e220bb537afa61db348d4b71677f.png" alt="r_{ss}"/>, the green vertical line
+indicates the first maximum after <img class="math" src="_images/math/93da830de95e8143d89d39ad3e3ad4c4b8b63020.png" alt="lag=0"/> (<em>TDetectSineFreq.m</em>).</span></p>
+</div>
+</div>
+<div class="section" id="software-application">
+<h4>2.3.3.2. Software application<a class="headerlink" href="#software-application" title="Permalink to this headline">¶</a></h4>
+<ol class="arabic simple">
+<li>Start the <em>jupyter</em> environment</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nb">cd</span> tsaLab/lab01
+<span class="nb">source</span> activate tsa
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>Copy this <a class="reference download internal" href="_downloads/template.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">template</span></code></a> into the working directory</li>
+</ol>
+<blockquote>
+<div>Download the <em>template</em> and copy it into the working directory and rename it to <code class="file docutils literal notranslate"><span class="pre">labo01.ipynb</span></code>.</div></blockquote>
+<ol class="arabic simple" start="3">
+<li>Start the <em>jupyter</em> notebook :</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>jupyter notebook
+</pre></div>
+</td></tr></table></div>
+<p>Then select and open the file <code class="file docutils literal notranslate"><span class="pre">labo01.ipynb</span></code>.</p>
+</div></blockquote>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Lab 1 - Correlation</a><ul>
+<li><a class="reference internal" href="#test-on-repl">2.1. TEST ON REPL</a></li>
+<li><a class="reference internal" href="#theoretical-part">2.2. Theoretical part</a><ul>
+<li><a class="reference internal" href="#white-and-colored-noise">2.2.1. White and colored noise</a><ul>
+<li><a class="reference internal" href="#fir-filter">2.2.1.1. <em>FIR</em> filter</a></li>
+<li><a class="reference internal" href="#iir-filter">2.2.1.2. <em>IIR</em> filter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auto-correlation">2.2.2. Auto-correlation</a><ul>
+<li><a class="reference internal" href="#difference-between-correlation-and-convolution">2.2.2.1. Difference between correlation and convolution</a></li>
+<li><a class="reference internal" href="#true-auto-correlation">2.2.2.2. True auto-correlation</a></li>
+<li><a class="reference internal" href="#biased-auto-correlation-estimate">2.2.2.3. Biased auto-correlation estimate</a></li>
+<li><a class="reference internal" href="#unbiased-auto-correlation-estimate">2.2.2.4. Unbiased auto-correlation estimate</a></li>
+<li><a class="reference internal" href="#biased-auto-covariance-estimate">2.2.2.5. Biased auto-covariance estimate</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cross-correlation">2.2.3. Cross-correlation</a><ul>
+<li><a class="reference internal" href="#true-cross-correlation">2.2.3.1. True cross-correlation</a></li>
+<li><a class="reference internal" href="#biased-cross-correlation-estimate">2.2.3.2. Biased cross-correlation estimate</a></li>
+<li><a class="reference internal" href="#unbiased-cross-correlation-estimate">2.2.3.3. Unbiased cross-correlation estimate</a></li>
+<li><a class="reference internal" href="#biased-cross-covariance-estimate">2.2.3.4. Biased cross-covariance estimate</a></li>
+<li><a class="reference internal" href="#coefficient-of-correlation">2.2.3.5. Coefficient of correlation</a></li>
+<li><a class="reference internal" href="#normalized-cross-correlation-estimate">2.2.3.6. Normalized cross-correlation estimate</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bit-correlator">2.2.4. 1 bit correlator</a></li>
+<li><a class="reference internal" href="#correlation-theorem">2.2.5. Correlation theorem</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#practical-part">2.3. Practical part</a><ul>
+<li><a class="reference internal" href="#toy-example">2.3.1. Toy example</a></li>
+<li><a class="reference internal" href="#toy-example-for-normalised-cross-correlation">2.3.2. Toy example for normalised cross-correlation</a></li>
+<li><a class="reference internal" href="#frequency-estimation-of-a-sine-wave">2.3.3. Frequency estimation of a sine wave</a><ul>
+<li><a class="reference internal" href="#context">2.3.3.1. Context</a></li>
+<li><a class="reference internal" href="#software-application">2.3.3.2. Software application</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="lab00-python-crash-course.html" title="previous chapter">1. Lab 0 - Python crash course</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/lab01-correlation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Pierre BRESSY, Michel KOCHER.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/lab01-correlation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
